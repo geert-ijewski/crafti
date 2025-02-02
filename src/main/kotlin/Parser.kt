@@ -1,7 +1,7 @@
 import TokenType.*;
 import Token;
 
-class Parser(tokens : List<Token>) {
+class Parser(val tokens : List<Token>) {
 	class ParseError() : RuntimeException() {}
 	var current : Int = 0;
 
@@ -110,7 +110,7 @@ class Parser(tokens : List<Token>) {
 
 	fun check(token: TokenType) : Boolean {
 		if(isAtEnd()) return false
-		return peek().type == type
+		return peek().type == token
 	}
 
 	fun advance() : Token {
@@ -122,9 +122,9 @@ class Parser(tokens : List<Token>) {
 		return peek().type == EOF
 	}
 
-	fun peek() : Token { return tokens.get(current) }
+	fun peek() : Token { return this.tokens.get(current) }
 
-	fun previous() : Token {return tokens[current - 1] }
+	fun previous() : Token {return this.tokens[current - 1] }
 
 	fun error(token: Token, message: String) : ParseError {
 		println(token.toString() + message)

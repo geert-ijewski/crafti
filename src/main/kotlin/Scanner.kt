@@ -12,14 +12,31 @@ class Scanner(
 	var line: Int = 1
 
 	fun scanTokens(): List<Token> {
-		while(!isAtEnd()) {
-			// start of next lexem
-			start = current;
-			scanToken();
+		while (!isAtEnd()) {
+			// skip whitespace and comments
+			skipWhitespaceAndComments()
+			if (isAtEnd()) break
+			start = current
+			scanToken()
 		}
+		tokens.add(Token(EOF, "", null, line))
+		return tokens
+	}
 
-		tokens.add(Token(EOF, "", null, line));
-		return tokens;
+	private fun skipWhitespaceAndComments() {
+		while (!isAtEnd()) {
+			val c = peek()
+			when {
+				c.isWhitespace() -> advance()
+				c == '/' && peekNext() == '/' -> {
+					// skip comment
+					advance() // skip first '/'
+					advance() // skip second '/'
+					while (peek() != '\n' && !isAtEnd()) advance()
+				}
+				else -> return
+			}
+		}
 	}
 
 	fun isAtEnd(): Boolean {
@@ -30,14 +47,7 @@ class Scanner(
 		println("scanToken() " + current.toString() + '"' + peek() + '"')
 		var c: Char = advance()
 
-		// skip whitespace and comments
-		while(c.isWhitespace() && !isAtEnd()) {
-			c = advance();
-		}
-		// if it ended with a whitespace we end here
-		if(isAtEnd()) {
-			return
-		}
+		// ...existing code...
 
 		// todo reserved words ans identifers P53
 
@@ -51,12 +61,14 @@ class Scanner(
 		'+' -> tokens.add(createToken(PLUS));
 		'-' -> tokens.add(createToken(MINUS));
 		'=' -> if(match('=')) createToken(EQUAL_EQUAL) else tokens.add(createToken(EQUAL));
-	    in '0'..'9' -> tokens.add(createNumber());
+		in '0'..'9' -> tokens.add(createNumber());
 		'/' -> {
 			if(match('/')) {
 				while(peek() != '\n' && !isAtEnd()) {
 					advance();
 				}
+				// After skipping comment, scan next token on the same line
+				if (!isAtEnd()) scanToken()
 			} else {
 				tokens.add(createToken(SLASH));
 			}
@@ -72,20 +84,19 @@ class Scanner(
 	// todo string P51
 
 	fun createNumber(): Token {
-	    while(peek().isDigit()) {
+		while(peek().isDigit()) {
 			advance()
 		}
 
 		if(peek() == '.' && peekNext().isDigit()) {
 			// consume .
-
-
+			advance()
 			while(peek().isDigit()) {
 				advance()
 			}
 		}
 
-		return Token(NUMBER, "", source.substring(start, current).toFloat(), line)
+		return Token(NUMBER, "", source.substring(start, current).toDouble(), line)
 	}
 
 	fun advance(): Char {

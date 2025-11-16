@@ -8,19 +8,16 @@ class SampleTest {
 
     @Test
     fun testSum() {
-        val expected = 42
-        assertEquals(expected, testLox.interpret("40+2"))
+        assertEquals(42.0, testLox.interpret("40+2"))
     }
 
     @Test
     fun testWhitespaceSum() {
-        val expected = 42
-        assertEquals(expected, testLox.interpret("  40	+\n 2	"))
+        assertEquals(42.0, testLox.interpret("  40\t+\n 2\t"))
     }
 
     @Test
     fun testComment() {
-        val expected = 20
-        assertEquals(expected, testLox.interpret("// abc\n1+19"))
-	}
+        assertEquals(20.0, testLox.interpret("// abc\n1+19"))
+    }
 }

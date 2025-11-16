@@ -2,16 +2,17 @@ import java.io.File
 import Scanner
 
 class Lox() {
-	fun interpret(script: String): Int {
-		val scanner = Scanner(script)
-		val tokens = scanner.scanTokens()
+	   fun interpret(script: String): Any? {
+			   val scanner = Scanner(script)
+			   val tokens = scanner.scanTokens()
 
-		for(token in tokens) {
-			println(token)
-		}
-	
-		return tokens.size
-	}
+			   val parser = Parser(tokens)
+			   val expr = parser.expression()
+			   val interpreter = Interpreter()
+			   val result = expr.accept(interpreter)
+			   println(result)
+			   return result
+	   }
 
 	fun error(token: Token, message: String) {
 		if(token.type == TokenType.EOF) {

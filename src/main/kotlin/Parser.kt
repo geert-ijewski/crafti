@@ -1,5 +1,5 @@
-import TokenType.*;
-import Token;
+import TokenType.*
+import Token
 
 class Parser(val tokens : List<Token>) {
 	class ParseError() : RuntimeException() {}
@@ -125,6 +125,7 @@ class Parser(val tokens : List<Token>) {
 	fun peek() : Token { return this.tokens.get(current) }
 
 	fun previous() : Token {return this.tokens[current - 1] }
+
 
 	fun error(token: Token, message: String) : ParseError {
 		println(token.toString() + message)

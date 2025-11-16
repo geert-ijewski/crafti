@@ -33,7 +33,7 @@ abstract class Expr {
 		}
 
 	class Literal(
-		val value : Any?,
+		val value : Object,
 	) : Expr(){
 
 		override fun <R> accept(visitor: Visitor<R>): R {

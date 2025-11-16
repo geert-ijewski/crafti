@@ -1,7 +1,7 @@
 import TokenType.*
 import Expr
 
-class Interpreter : Expr.Visitor<Any?> {
+class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Void> {
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
     }
@@ -33,5 +33,19 @@ class Interpreter : Expr.Visitor<Any?> {
             TokenType.BANG_EQUAL -> left != right
             else -> throw UnsupportedOperationException("Unsupported binary operator: ${expr.operator.type}")
         }
+    }
+
+    fun interpret(List<Stmt> statments) {
+        try {
+            for(val stmt : statments) {
+                execute(statment)
+            }
+        } catch(RuntimeError e) {
+            Lox.RuntimeError(error);
+        }
+    }
+
+    fun execute(Stmt stmt) {
+        stmt.accept(this);
     }
 }

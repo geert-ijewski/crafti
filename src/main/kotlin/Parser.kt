@@ -5,6 +5,43 @@ class Parser(val tokens : List<Token>) {
 	class ParseError() : RuntimeException() {}
 	var current : Int = 0;
 
+	fun parse(): List<Stmt> {
+		val stmts = List();
+		while(!isAtEnd()) {
+			statments.add(statment())
+		}
+
+		return statments;
+	}
+
+	fun statment() : Stmt {
+		if(match(PRINT)) return printStatment();
+
+		return expressionStatment();
+	}
+
+	fun printStatment() : Stmt {
+		val value = expression();
+		consume(SEMICOLON, "expected ; after value");
+		return new Stmt.Print(value);
+	}
+
+	fun expressionStatment() : Stmt {
+		val expr = expression();
+		consume(SEMICOLON, "expected ; after value");
+		return new Stmt.Expression(expr);
+	}
+
+	fun visitExpressionStmt(Stmt.Expression stmt) {
+		evaluate(stmt.expression);
+		return null;
+	}
+
+	fun visitPrintStmt(Stmt.Print stmt) {
+		val value = evaluate(stmt.expression);
+		System.out.println(stringify(value));
+	}
+
 	fun expression() : Expr {
 		return equality()
 	}

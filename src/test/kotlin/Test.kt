@@ -20,4 +20,9 @@ class SampleTest {
     fun testComment() {
         assertEquals(20.0, testLox.interpret("// abc\n1+19"))
     }
+
+    @Test
+    fun testPrint() {
+        testLox.interpret("print 2+2;");
+    }
 }

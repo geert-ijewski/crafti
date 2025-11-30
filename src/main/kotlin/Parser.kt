@@ -6,12 +6,12 @@ class Parser(val tokens: List<Token>) {
 	var current : Int = 0;
 
 	fun parse(): List<Stmt> {
-		val stmts = List();
+		val stmts: MutableList<Stmt> = mutableListOf()
 		while(!isAtEnd()) {
-			statments.add(statment())
+			stmts.add(statment())
 		}
 
-		return statments;
+		return stmts
 	}
 
 	fun statment() : Stmt {
@@ -23,23 +23,13 @@ class Parser(val tokens: List<Token>) {
 	fun printStatment() : Stmt {
 		val value = expression();
 		consume(SEMICOLON, "expected ; after value");
-		return new Stmt.Print(value);
+		return Stmt.Print(value);
 	}
 
 	fun expressionStatment() : Stmt {
 		val expr = expression();
 		consume(SEMICOLON, "expected ; after value");
-		return new Stmt.Expression(expr);
-	}
-
-	fun visitExpressionStmt(Stmt.Expression stmt) {
-		evaluate(stmt.expression);
-		return null;
-	}
-
-	fun visitPrintStmt(Stmt.Print stmt) {
-		val value = evaluate(stmt.expression);
-		System.out.println(stringify(value));
+		return Stmt.Expression(expr);
 	}
 
 	fun expression() : Expr {

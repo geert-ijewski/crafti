@@ -1,7 +1,7 @@
 import TokenType.*
 import Expr
 
-class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Void> {
+class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
     }
@@ -34,18 +34,48 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Void> {
             else -> throw UnsupportedOperationException("Unsupported binary operator: ${expr.operator.type}")
         }
     }
+ 
+	override fun visitExpressionStmt(stmt : Stmt.Expression ) : Any? {
+        evaluate(stmt.expression)
+        return null
+	}
 
-    fun interpret(List<Stmt> statments) {
+	override fun visitPrintStmt(stmt : Stmt.Print )  : Any?{
+        val value = evaluate(stmt.expression)
+        println(stringify(value))
+        return null
+	}
+
+
+    fun interpret(statements : List<Stmt>) {
         try {
-            for(val stmt : statments) {
-                execute(statment)
+            for(stmt in statements) {
+                execute(stmt)
             }
-        } catch(RuntimeError e) {
-            Lox.RuntimeError(error);
+        } catch(e : RuntimeError) {
+            println(e.message)
         }
     }
 
-    fun execute(Stmt stmt) {
+    fun execute(stmt : Stmt) {
         stmt.accept(this);
     }
+
+    private fun evaluate(expr: Expr): Any? {
+        return expr.accept(this)
+    }
+
+    private fun stringify(obj: Any?): String {
+        if (obj == null) return "nil"
+        if (obj is Double) {
+            var text = obj.toString()
+            if (text.endsWith(".0")) {
+                text = text.substring(0, text.length - 2)
+            }
+            return text
+        }
+        return obj.toString()
+    }
+
+    class RuntimeError(message: String) : RuntimeException(message)
 }

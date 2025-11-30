@@ -8,12 +8,12 @@ class SampleTest {
 
     @Test
     fun testSum() {
-        assertEquals(42.0, testLox.interpret("40+2"))
+        assertEquals(42.0, testLox.interpret("40+2;"))
     }
 
     @Test
     fun testWhitespaceSum() {
-        assertEquals(42.0, testLox.interpret("  40\t+\n 2\t"))
+        assertEquals(42.0, testLox.interpret("  40\t+\n 2\t;"))
     }
 
     @Test

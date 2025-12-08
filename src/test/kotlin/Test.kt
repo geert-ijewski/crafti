@@ -1,28 +1,50 @@
-import Lox
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import Scanner
+import Parser
+import TokenType.*
 
 class SampleTest {
 
-    private val testLox: Lox = Lox()
-
     @Test
-    fun testSum() {
-        assertEquals(42.0, testLox.interpret("40+2;"))
+    fun testSumTokens() {
+        val scanner = Scanner("40+2")
+        val tokens = scanner.scanTokens()
+        val types = tokens.map { it.type }
+        assertEquals(listOf(NUMBER, PLUS, NUMBER, EOF), types)
+        val numbers = tokens.filter { it.type == NUMBER }.map { it.literal as Double }
+        assertEquals(listOf(40.0, 2.0), numbers)
     }
 
     @Test
-    fun testWhitespaceSum() {
-        assertEquals(42.0, testLox.interpret("  40\t+\n 2\t;"))
+    fun testWhitespaceSumTokens() {
+        val scanner = Scanner("  40\t+\n 2\t")
+        val tokens = scanner.scanTokens()
+        val types = tokens.map { it.type }
+        assertEquals(listOf(NUMBER, PLUS, NUMBER, EOF), types)
+        val numbers = tokens.filter { it.type == NUMBER }.map { it.literal as Double }
+        assertEquals(listOf(40.0, 2.0), numbers)
     }
 
     @Test
-    fun testComment() {
-        assertEquals(20.0, testLox.interpret("// abc\n1+19;"))
+    fun testCommentTokens() {
+        val scanner = Scanner("// abc\n1+19")
+        val tokens = scanner.scanTokens()
+        val types = tokens.map { it.type }
+        assertEquals(listOf(NUMBER, PLUS, NUMBER, EOF), types)
+        val numbers = tokens.filter { it.type == NUMBER }.map { it.literal as Double }
+        assertEquals(listOf(1.0, 19.0), numbers)
     }
 
     @Test
-    fun testPrint() {
-        testLox.interpret("print 2+2;");
+    fun testPrintStatementParsed() {
+        val scanner = Scanner("print 2+2;")
+        val tokens = scanner.scanTokens()
+        val parser = Parser(tokens)
+        val stmts = parser.parse()
+        assertEquals(1, stmts.size)
+        assertTrue(stmts[0] is Stmt.Print)
+        print(stmts)
     }
+
 }

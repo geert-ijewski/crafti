@@ -11,6 +11,19 @@ class Scanner(
 	var current: Int = 0
 	var line: Int = 1
 
+	var keywords = mapOf(
+		"and" to AND,
+		"class" to CLASS,
+		"else" to ELSE,
+		"false" to FALSE,
+		"for" to FOR,
+		"fun" to FUNCTION,
+		"if" to IF,
+		"print" to PRINT,
+		"return" to RETURN,
+		"true" to TRUE
+	)
+
 	fun scanTokens(): List<Token> {
 		while (!isAtEnd()) {
 			// skip whitespace and comments
@@ -44,12 +57,7 @@ class Scanner(
 	}
 
 	fun scanToken() {
-		println("scanToken() " + current.toString() + '"' + peek() + '"')
 		var c: Char = advance()
-
-		// ...existing code...
-
-		// todo reserved words ans identifers P53
 
 		when(c) {
 		'{' -> tokens.add(createToken(LEFT_BRACE));
@@ -76,6 +84,7 @@ class Scanner(
 		in 'a'..'z' -> tokens.add(createIdentifier())
 		in 'A'..'Z' -> tokens.add(createIdentifier())
 		'"' -> tokens.add(createString())
+		';' -> tokens.add(createToken(SEMICOLON))
 		else -> throw Error("unknown token: '" + c + '\'')
 		}
 	}
@@ -115,7 +124,13 @@ class Scanner(
 			advance()
 		}
 
-		return Token(IDENTIFIER, "", source.substring(start, current), line)
+		val identifier = source.substring(start, current)
+
+		return if(keywords.contains(identifier)) {
+			createToken(keywords.get(identifier)!!)
+		} else {
+			createToken(IDENTIFIER)
+		}
 	}
 
 	fun advance(): Char {

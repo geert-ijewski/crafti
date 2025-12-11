@@ -21,7 +21,8 @@ class Scanner(
 		"if" to IF,
 		"print" to PRINT,
 		"return" to RETURN,
-		"true" to TRUE
+		"true" to TRUE,
+		"var" to VAR
 	)
 
 	fun scanTokens(): List<Token> {

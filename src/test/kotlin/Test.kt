@@ -46,4 +46,17 @@ class SampleTest {
         assertTrue(stmts[0] is Stmt.Print)
     }
 
+    @Test
+    fun testVariableAssignment() {
+        val scanner = Scanner("var a = 123;print a;")
+        val tokens = scanner.scanTokens()
+        assertEquals(9, tokens.size)
+        val parser = Parser(tokens)
+        val stmts = parser.parse()
+        assertEquals(2, stmts.size)
+
+        val interpreter = Interpreter()
+        interpreter.interpret(stmts)
+    }
+
 }

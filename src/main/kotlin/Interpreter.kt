@@ -2,6 +2,8 @@ import TokenType.*
 import Expr
 
 class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+    val enviroment = Enviroment()
+ 
     fun interpret(statements : List<Stmt?>) {
         try {
             for(stmt in statements) {
@@ -15,12 +17,19 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     }
 
     override fun visitVarStmt(stmt : Stmt.Var) : Any? {
-        return stmt.initializer
+        val value = if(stmt.initializer != null) {
+            evaluate(stmt.initializer)
+        } else {
+            null
+        }
+
+        enviroment.define(stmt.name.lexeme, value)
+        return null
     }
 
  
 	override fun visitVariableExpr(expr : Expr.Variable) : Any? {
-        return expr.name
+        return enviroment.get(expr.name.lexeme)
     }
 
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {

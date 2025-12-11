@@ -55,7 +55,7 @@ class SampleTest {
         val stmts = parser.parse()
         assertEquals(2, stmts.size)
 
-        val interpreter = Interpreter()
+        val interpreter = Interpreter { str: String -> assertEquals("123", str) }
         interpreter.interpret(stmts)
     }
 

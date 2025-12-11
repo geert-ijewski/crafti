@@ -1,7 +1,7 @@
 import TokenType.*
 import Expr
 
-class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
     val enviroment = Enviroment()
  
     fun interpret(statements : List<Stmt?>) {
@@ -72,7 +72,7 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 
 	override fun visitPrintStmt(stmt : Stmt.Print )  : Any?{
         val value = evaluate(stmt.expression)
-        println(stringify(value))
+        printFunction(stringify(value))
         return null
 	}
 

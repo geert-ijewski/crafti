@@ -8,7 +8,7 @@ class Lox() {
 
 		  val parser = Parser(tokens)
 		  val statements = parser.parse()
-		  val interpreter = Interpreter()
+		  val interpreter = Interpreter { s: String -> println(s) }
 		  return interpreter.interpret(statements)
 	  }
 

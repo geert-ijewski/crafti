@@ -2,6 +2,27 @@ import TokenType.*
 import Expr
 
 class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
+    fun interpret(statements : List<Stmt?>) {
+        try {
+            for(stmt in statements) {
+                if(stmt == null) continue
+
+                execute(stmt)
+            }
+        } catch(e : RuntimeException) {
+            println(e.message)
+        }
+    }
+
+    override fun visitVarStmt(stmt : Stmt.Var) : Any? {
+        return stmt.initializer
+    }
+
+ 
+	override fun visitVariableExpr(expr : Expr.Variable) : Any? {
+        return expr.name
+    }
+
     override fun visitLiteralExpr(expr: Expr.Literal): Any? {
         return expr.value
     }
@@ -47,16 +68,6 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
 	}
 
 
-    fun interpret(statements : List<Stmt>) {
-        try {
-            for(stmt in statements) {
-                execute(stmt)
-            }
-        } catch(e : RuntimeError) {
-            println(e.message)
-        }
-    }
-
     fun execute(stmt : Stmt) {
         stmt.accept(this);
     }
@@ -76,6 +87,4 @@ class Interpreter : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
         }
         return obj.toString()
     }
-
-    class RuntimeError(message: String) : RuntimeException(message)
 }

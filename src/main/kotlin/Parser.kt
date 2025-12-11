@@ -5,13 +5,39 @@ class Parser(val tokens: List<Token>) {
 	class ParseError() : RuntimeException() {}
 	var current : Int = 0;
 
-	fun parse(): List<Stmt> {
-		val stmts: MutableList<Stmt> = mutableListOf()
+	fun parse(): List<Stmt?> {
+		val stmts: MutableList<Stmt?> = mutableListOf()
 		while(!isAtEnd()) {
-			stmts.add(statment())
+			stmts.add(declaration())
 		}
 
 		return stmts
+	}
+
+	fun declaration() : Stmt? {
+		try {
+			return if(match(VAR)) {
+				varDeclaration();
+			} else {
+				statment();
+			}
+		} catch(e : RuntimeException) {
+			synchronize();
+			return null;
+		}
+	}
+
+	fun varDeclaration() : Stmt {
+		val name = consume(IDENTIFIER, "expected variable name")
+
+		var initalizer: Expr? = if(match(EQUAL)) {
+			expression();
+		} else {
+			null
+		}
+
+		consume(SEMICOLON, "expect ';' after variable declaration");
+		return Stmt.Var(name, initalizer)
 	}
 
 	fun statment() : Stmt {
@@ -112,6 +138,10 @@ class Parser(val tokens: List<Token>) {
 			val expr = expression()
 			consume(TokenType.RIGHT_PAREN, "expect ) after exprrssion");
 			return Expr.Grouping(expr)
+		}
+
+		if(match(TokenType.IDENTIFIER)) {
+			return Expr.Variable(previous())
 		}
 
 		throw error(peek(), "primary didn't match current token")

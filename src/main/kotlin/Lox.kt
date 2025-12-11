@@ -9,8 +9,7 @@ class Lox() {
 		  val parser = Parser(tokens)
 		  val statements = parser.parse()
 		  val interpreter = Interpreter()
-		  interpreter.interpret(statements)
-		  return null
+		  return interpreter.interpret(statements)
 	  }
 
 	fun error(token: Token, message: String) {

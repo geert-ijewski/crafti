@@ -44,7 +44,6 @@ class SampleTest {
         val stmts = parser.parse()
         assertEquals(1, stmts.size)
         assertTrue(stmts[0] is Stmt.Print)
-        print(stmts)
     }
 
 }

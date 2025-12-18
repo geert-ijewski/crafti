@@ -59,4 +59,16 @@ class SampleTest {
         interpreter.interpret(stmts)
     }
 
+    @Test
+    fun testMultiVariableAndReassignment() {
+        val scanner = Scanner("var a = 99;var b = 0;b=1;var c = a+b;print c;")
+        val tokens = scanner.scanTokens()
+        assertEquals(25, tokens.size)
+        val parser = Parser(tokens)
+        val stmts = parser.parse()
+        assertEquals(5, stmts.size)
+
+        val interpreter = Interpreter { str: String -> assertEquals("100", str) }
+        interpreter.interpret(stmts)
+    }
 }

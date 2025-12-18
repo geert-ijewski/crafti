@@ -8,6 +8,15 @@ class Enviroment() {
 		values[name] = value
 	}
 
+	fun assign(name: String, value: Any?) {
+		if(values.containsKey(name)) {
+			values[name] = value
+			return
+		}
+
+		throw RuntimeException("Undefined variable: '$name'")
+	}
+
 	/**
 	 * Getter: return the stored value for [name].
 	 * Throws RuntimeException if the key does not exist.

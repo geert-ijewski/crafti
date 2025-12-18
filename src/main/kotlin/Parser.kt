@@ -14,6 +14,24 @@ class Parser(val tokens: List<Token>) {
 		return stmts
 	}
 
+	fun assignment() : Expr {
+		val expr = equality()
+
+		if(match(EQUAL)) {
+			val equals = previous()
+			val value = assignment()
+
+			if(expr is Expr.Variable) {
+				val name = expr.name
+				return Expr.Assign(name, value)
+			}
+
+			error(equals, "invalid assignment target")
+		}
+
+		return expr
+	}
+
 	fun declaration() : Stmt? {
 		try {
 			return if(match(VAR)) {
@@ -59,7 +77,7 @@ class Parser(val tokens: List<Token>) {
 	}
 
 	fun expression() : Expr {
-		return equality()
+		return assignment()
 	}
 
 	fun equality() : Expr {
@@ -179,9 +197,9 @@ class Parser(val tokens: List<Token>) {
 		return peek().type == EOF
 	}
 
-	   fun peek() : Token { return tokens[current] }
+	fun peek() : Token { return tokens[current] }
 
-	   fun previous() : Token { return tokens[current - 1] }
+	fun previous() : Token { return tokens[current - 1] }
 
 	fun error(token: Token, message: String) : ParseError {
 		println(token.toString() + message)

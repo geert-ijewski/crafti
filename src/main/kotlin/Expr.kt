@@ -3,6 +3,7 @@ import kotlin.collections.List
 abstract class Expr {
 	interface Visitor<out R> {
 		fun visitBinaryExpr(expr : Binary) : R;
+		fun visitAssignExpr(expr : Assign) : R;
 		fun visitGroupingExpr(expr : Grouping) : R;
 		fun visitLiteralExpr(expr : Literal) : R;
 		fun visitUnaryExpr(expr : Unary) : R;
@@ -21,6 +22,16 @@ abstract class Expr {
 
 		override fun <R> accept(visitor: Visitor<R>): R {
 			return visitor.visitBinaryExpr(this);
+}
+		}
+
+	class Assign(
+		val name : Token,
+		val value : Expr,
+	) : Expr(){
+
+		override fun <R> accept(visitor: Visitor<R>): R {
+			return visitor.visitAssignExpr(this);
 }
 		}
 

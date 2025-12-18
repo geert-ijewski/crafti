@@ -96,4 +96,10 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
         }
         return obj.toString()
     }
+
+    override fun visitAssignExpr(expr : Expr.Assign) : Any? {
+        val value = evaluate(expr.value)
+        enviroment.assign(expr.name.lexeme, value)
+        return value
+    }
 }

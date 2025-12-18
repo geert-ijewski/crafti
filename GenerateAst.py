@@ -49,6 +49,7 @@ if len(sys.argv) < 2:
 outputDir = sys.argv[1]
 defineAst(outputDir, "Expr", [
 	"Binary		: Expr left, Token operator, Expr right",
+    "Assign     : Token name, Expr value",
 	"Grouping	: Expr expression",
 	"Literal	: Any? value",
 	"Unary		: Token operator, Expr right",

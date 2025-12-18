@@ -3,6 +3,10 @@ class AstPrinter : Expr.Visitor<String> {
 		return expr.accept(this)
 	}
 
+	override fun visitAssignExpr(expr : Expr.Assign) : String {
+		return "assign " + expr.name + " " + expr.value;
+	}
+
 	override fun visitVariableExpr(expr : Expr.Variable) : String {
 		return "var " + expr.name;
 	}

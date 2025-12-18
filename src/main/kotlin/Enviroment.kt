@@ -1,4 +1,4 @@
-class Enviroment() {
+class Enviroment(val enclosing: Enviroment? = null) {
 	private val values: MutableMap<String, Any?> = mutableMapOf()
 
 	/**
@@ -13,6 +13,10 @@ class Enviroment() {
 			values[name] = value
 			return
 		}
+		if(this.enclosing != null) {
+			this.enclosing.assign(name, value)
+			return
+		}
 
 		throw RuntimeException("Undefined variable: '$name'")
 	}
@@ -22,10 +26,13 @@ class Enviroment() {
 	 * Throws RuntimeException if the key does not exist.
 	 */
 	fun get(name: String): Any? {
-		if (!values.containsKey(name)) {
-			throw RuntimeException("Undefined variable: '$name'")
+		if (values.containsKey(name)) {
+			return values[name]
 		}
-		return values[name]
+		if(this.enclosing != null) {
+			return this.enclosing.get(name)
+		}
+		throw RuntimeException("Undefined variable: '$name'")
 	}
 
 }

@@ -60,6 +60,14 @@ class Parser(val tokens: List<Token>) {
 
 	fun statment() : Stmt {
 		if(match(PRINT)) return printStatment();
+		if(match(LEFT_BRACE)) {
+			val statements: MutableList<Stmt> = mutableListOf()
+			while(!check(RIGHT_BRACE) && !isAtEnd()) {
+				statements.add(declaration()!!)
+			}
+			consume(RIGHT_BRACE, "expect '}' after block")
+			return Stmt.Block(statements)
+		}
 
 		return expressionStatment();
 	}

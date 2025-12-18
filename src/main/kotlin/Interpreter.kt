@@ -2,7 +2,7 @@ import TokenType.*
 import Expr
 
 class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
-    val enviroment = Enviroment()
+    var enviroment = Enviroment()
  
     fun interpret(statements : List<Stmt?>) {
         try {
@@ -101,5 +101,18 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
         val value = evaluate(expr.value)
         enviroment.assign(expr.name.lexeme, value)
         return value
+    }
+
+    override fun visitBlockStmt(stmt: Stmt.Block): Any? {
+        val previousEnv = enviroment
+        val blockEnv = Enviroment(previousEnv)
+        try {
+            for (statement in stmt.statements) {
+                execute(statement)
+            }
+        } finally {
+            enviroment = previousEnv
+        }
+        return null
     }
 }

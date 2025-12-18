@@ -56,6 +56,7 @@ defineAst(outputDir, "Expr", [
     "Variable    : Token name"
 ])
 defineAst(outputDir, "Stmt", [
+    "Block		: List<Stmt> statements",
     "Expression	: Expr expression",
     "Print		: Expr expression",
     "Var        : Token name, Expr? initializer"

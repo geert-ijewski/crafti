@@ -71,4 +71,20 @@ class SampleTest {
         val interpreter = Interpreter { str: String -> assertEquals("100", str) }
         interpreter.interpret(stmts)
     }
+
+    @Test
+    fun testBlockScope() {
+        val scanner = Scanner("var a = 10; { var a = 20; print a; } print a;")
+        val tokens = scanner.scanTokens()
+        val parser = Parser(tokens)
+        val stmts = parser.parse()
+        val interpreter = Interpreter { str: String ->
+            when (str) {
+                "20" -> {} 
+                "10" -> {} 
+                else -> fail("Unexpected print output: $str")
+            }
+        }
+        interpreter.interpret(stmts)
+    }
 }

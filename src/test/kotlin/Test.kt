@@ -87,4 +87,40 @@ class SampleTest {
         }
         interpreter.interpret(stmts)
     }
+
+    @Test
+    fun testIfElseStatement() {
+        val scanner = Scanner("var a = 10; if (a < 5) { print 1; } else { print 2; }")
+        val parser = Parser(scanner.scanTokens())
+        val outputs = mutableListOf<String>()
+        val interpreter = Interpreter { str: String ->
+            outputs.add(str)
+        }
+        interpreter.interpret(parser.parse())
+        assertEquals(listOf("2"), outputs)
+    }
+
+    @Test
+    fun testIfStatement() {
+        val scanner = Scanner("var a = 10; if (a > 5) { print 1; }")
+        val parser = Parser(scanner.scanTokens())
+        val outputs = mutableListOf<String>()
+        val interpreter = Interpreter { str: String ->
+            outputs.add(str)
+        }
+        interpreter.interpret(parser.parse())
+        assertEquals(listOf("1"), outputs)
+    }
+
+    @Test
+    fun testIfDoesntAlwaysEvaluateStatement() {
+        val scanner = Scanner("var a = 0; if (a > 5) { print 1; }")
+        val parser = Parser(scanner.scanTokens())
+        val outputs = mutableListOf<String>()
+        val interpreter = Interpreter { str: String ->
+            outputs.add(str)
+        }
+        interpreter.interpret(parser.parse())
+        assertEquals(0, outputs.size)
+    }
 }

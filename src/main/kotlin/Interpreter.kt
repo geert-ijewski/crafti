@@ -76,6 +76,16 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
         return null
 	}
 
+    override fun visitIfStmt(stmt: Stmt.If): Any? {
+        val condition = evaluate(stmt.condition) as Boolean
+        if (condition) {
+            execute(stmt.thenBranch)
+        } else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch)
+        }
+        return null
+    }
+
 
     fun execute(stmt : Stmt) {
         stmt.accept(this);

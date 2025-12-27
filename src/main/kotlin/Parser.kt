@@ -59,6 +59,7 @@ class Parser(val tokens: List<Token>) {
 	}
 
 	fun statment() : Stmt {
+		if(match(IF)) { return ifStatment(); }
 		if(match(PRINT)) return printStatment();
 		if(match(LEFT_BRACE)) {
 			val statements: MutableList<Stmt> = mutableListOf()
@@ -70,6 +71,20 @@ class Parser(val tokens: List<Token>) {
 		}
 
 		return expressionStatment();
+	}
+
+	fun ifStatment() : Stmt {
+		consume(LEFT_PAREN, "expect '(' after 'if'")
+		val condition = expression()
+		consume(RIGHT_PAREN, "expect ')' after if condition")
+
+		val thenBranch = statment()
+		var elseBranch: Stmt? = null
+		if(match(ELSE)) {
+			elseBranch = statment()
+		}
+
+		return Stmt.If(condition, thenBranch, elseBranch)
 	}
 
 	fun printStatment() : Stmt {

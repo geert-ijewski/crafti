@@ -69,6 +69,8 @@ class Scanner(
 		'.' -> tokens.add(createToken(DOT));
 		'+' -> tokens.add(createToken(PLUS));
 		'-' -> tokens.add(createToken(MINUS));
+		'>' -> tokens.add(createToken(GREATER));
+		'<' -> tokens.add(createToken(LESSER));
 		'=' -> if(match('=')) createToken(EQUAL_EQUAL) else tokens.add(createToken(EQUAL));
 		in '0'..'9' -> tokens.add(createNumber());
 		'/' -> {

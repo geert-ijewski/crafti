@@ -61,6 +61,13 @@ class Parser(val tokens: List<Token>) {
 	fun statment() : Stmt {
 		if(match(IF)) { return ifStatment(); }
 		if(match(PRINT)) return printStatment();
+		if(match(WHILE)) {
+			consume(LEFT_PAREN, "expect '(' after 'while'")
+			val condition = expression()
+			consume(RIGHT_PAREN, "expect ')' after condition")
+			val body = statment()
+			return Stmt.While(condition, body)
+		}
 		if(match(LEFT_BRACE)) {
 			val statements: MutableList<Stmt> = mutableListOf()
 			while(!check(RIGHT_BRACE) && !isAtEnd()) {

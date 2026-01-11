@@ -125,4 +125,11 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
         }
         return null
     }
+
+    override fun visitWhileStmt(expr: Stmt.While): Any? {
+        while (evaluate(expr.condition) as Boolean) {
+            execute(expr.body)
+        }
+        return null
+    }
 }

@@ -3,9 +3,11 @@ import kotlin.collections.List
 abstract class Expr {
 	interface Visitor<out R> {
 		fun visitBinaryExpr(expr : Binary) : R;
+		fun visitAssignExpr(expr : Assign) : R;
 		fun visitGroupingExpr(expr : Grouping) : R;
 		fun visitLiteralExpr(expr : Literal) : R;
 		fun visitUnaryExpr(expr : Unary) : R;
+		fun visitVariableExpr(expr : Variable) : R;
 }
 
 
@@ -23,6 +25,16 @@ abstract class Expr {
 }
 		}
 
+	class Assign(
+		val name : Token,
+		val value : Expr,
+	) : Expr(){
+
+		override fun <R> accept(visitor: Visitor<R>): R {
+			return visitor.visitAssignExpr(this);
+}
+		}
+
 	class Grouping(
 		val expression : Expr,
 	) : Expr(){
@@ -33,7 +45,7 @@ abstract class Expr {
 		}
 
 	class Literal(
-		val value : Object,
+		val value : Any?,
 	) : Expr(){
 
 		override fun <R> accept(visitor: Visitor<R>): R {
@@ -48,6 +60,15 @@ abstract class Expr {
 
 		override fun <R> accept(visitor: Visitor<R>): R {
 			return visitor.visitUnaryExpr(this);
+}
+		}
+
+	class Variable(
+		val name : Token,
+	) : Expr(){
+
+		override fun <R> accept(visitor: Visitor<R>): R {
+			return visitor.visitVariableExpr(this);
 }
 		}
 

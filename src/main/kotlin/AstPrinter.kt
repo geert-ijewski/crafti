@@ -3,12 +3,20 @@ class AstPrinter : Expr.Visitor<String> {
 		return expr.accept(this)
 	}
 
+	override fun visitAssignExpr(expr : Expr.Assign) : String {
+		return "assign " + expr.name + " " + expr.value;
+	}
+
+	override fun visitVariableExpr(expr : Expr.Variable) : String {
+		return "var " + expr.name;
+	}
+
 	override fun visitBinaryExpr(expr : Expr.Binary) : String {
 		return parenthesize(expr.operator.lexeme, expr.left, expr.right)
 	}
 
 	override fun visitGroupingExpr(expr : Expr.Grouping) : String {
-		return "" // todo parenthesize("group", expr.expression)
+		return parenthesize("group", expr.expression)
 	}
 
 	override fun visitLiteralExpr(expr : Expr.Literal) : String {
@@ -18,7 +26,7 @@ class AstPrinter : Expr.Visitor<String> {
 	}
 
 	override fun visitUnaryExpr(expr: Expr.Unary) : String {
-		return "" // todo parenthesize(expr.operator.lexeme, expr.right)
+		return parenthesize(expr.operator.lexeme, expr.right)
 	}
 
 	fun parenthesize(name : String, vararg exprs : Expr) : String {

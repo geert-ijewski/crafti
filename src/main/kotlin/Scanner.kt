@@ -11,6 +11,20 @@ class Scanner(
 	var current: Int = 0
 	var line: Int = 1
 
+	var keywords = mapOf(
+		"and" to AND,
+		"class" to CLASS,
+		"else" to ELSE,
+		"false" to FALSE,
+		"for" to FOR,
+		"fun" to FUNCTION,
+		"if" to IF,
+		"print" to PRINT,
+		"return" to RETURN,
+		"true" to TRUE,
+		"var" to VAR
+	)
+
 	fun scanTokens(): List<Token> {
 		while (!isAtEnd()) {
 			// skip whitespace and comments
@@ -44,12 +58,7 @@ class Scanner(
 	}
 
 	fun scanToken() {
-		println("scanToken() " + current.toString() + '"' + peek() + '"')
 		var c: Char = advance()
-
-		// ...existing code...
-
-		// todo reserved words ans identifers P53
 
 		when(c) {
 		'{' -> tokens.add(createToken(LEFT_BRACE));
@@ -60,6 +69,8 @@ class Scanner(
 		'.' -> tokens.add(createToken(DOT));
 		'+' -> tokens.add(createToken(PLUS));
 		'-' -> tokens.add(createToken(MINUS));
+		'>' -> tokens.add(createToken(GREATER));
+		'<' -> tokens.add(createToken(LESSER));
 		'=' -> if(match('=')) createToken(EQUAL_EQUAL) else tokens.add(createToken(EQUAL));
 		in '0'..'9' -> tokens.add(createNumber());
 		'/' -> {
@@ -73,6 +84,10 @@ class Scanner(
 				tokens.add(createToken(SLASH));
 			}
 		}
+		in 'a'..'z' -> tokens.add(createIdentifier())
+		in 'A'..'Z' -> tokens.add(createIdentifier())
+		'"' -> tokens.add(createString())
+		';' -> tokens.add(createToken(SEMICOLON))
 		else -> throw Error("unknown token: '" + c + '\'')
 		}
 	}
@@ -81,7 +96,15 @@ class Scanner(
 		return Token(type, source.substring(start, current), null, line)
 	}
 
-	// todo string P51
+	fun createString(): Token {
+		advance() // skip the current "
+		// find next "
+		while(peek() != '"') {
+			advance()
+		}
+		
+		return Token(STRING, "", source.substring(start, current), line)
+	}
 
 	fun createNumber(): Token {
 		while(peek().isDigit()) {
@@ -97,6 +120,20 @@ class Scanner(
 		}
 
 		return Token(NUMBER, "", source.substring(start, current).toDouble(), line)
+	}
+
+	fun createIdentifier() : Token {
+		while(peek().isLetter()) {
+			advance()
+		}
+
+		val identifier = source.substring(start, current)
+
+		return if(keywords.contains(identifier)) {
+			createToken(keywords.get(identifier)!!)
+		} else {
+			createToken(IDENTIFIER)
+		}
 	}
 
 	fun advance(): Char {

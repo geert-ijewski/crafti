@@ -5,45 +5,109 @@ class Parser(val tokens : List<Token>) {
 	class ParseError() : RuntimeException() {}
 	var current : Int = 0;
 
-	fun parse(): List<Stmt> {
-		val stmts = List();
+	fun parse(): List<Stmt?> {
+		val stmts: MutableList<Stmt?> = mutableListOf()
 		while(!isAtEnd()) {
-			statments.add(statment())
+			stmts.add(declaration())
 		}
 
-		return statments;
+		return stmts
+	}
+
+	fun assignment() : Expr {
+		val expr = equality()
+
+		if(match(EQUAL)) {
+			val equals = previous()
+			val value = assignment()
+
+			if(expr is Expr.Variable) {
+				val name = expr.name
+				return Expr.Assign(name, value)
+			}
+
+			error(equals, "invalid assignment target")
+		}
+
+		return expr
+	}
+
+	fun declaration() : Stmt? {
+		try {
+			return if(match(VAR)) {
+				varDeclaration();
+			} else {
+				statment();
+			}
+		} catch(e : RuntimeException) {
+			synchronize();
+			return null;
+		}
+	}
+
+	fun varDeclaration() : Stmt {
+		val name = consume(IDENTIFIER, "expected variable name")
+
+		var initalizer: Expr? = if(match(EQUAL)) {
+			expression();
+		} else {
+			null
+		}
+
+		consume(SEMICOLON, "expect ';' after variable declaration");
+		return Stmt.Var(name, initalizer)
 	}
 
 	fun statment() : Stmt {
+		if(match(IF)) { return ifStatment(); }
 		if(match(PRINT)) return printStatment();
+		if(match(WHILE)) {
+			consume(LEFT_PAREN, "expect '(' after 'while'")
+			val condition = expression()
+			consume(RIGHT_PAREN, "expect ')' after condition")
+			val body = statment()
+			return Stmt.While(condition, body)
+		}
+		if(match(LEFT_BRACE)) {
+			val statements: MutableList<Stmt> = mutableListOf()
+			while(!check(RIGHT_BRACE) && !isAtEnd()) {
+				statements.add(declaration()!!)
+			}
+			consume(RIGHT_BRACE, "expect '}' after block")
+			return Stmt.Block(statements)
+		}
 
 		return expressionStatment();
+	}
+
+	fun ifStatment() : Stmt {
+		consume(LEFT_PAREN, "expect '(' after 'if'")
+		val condition = expression()
+		consume(RIGHT_PAREN, "expect ')' after if condition")
+
+		val thenBranch = statment()
+		var elseBranch: Stmt? = null
+		if(match(ELSE)) {
+			elseBranch = statment()
+		}
+
+		return Stmt.If(condition, thenBranch, elseBranch)
 	}
 
 	fun printStatment() : Stmt {
 		val value = expression();
 		consume(SEMICOLON, "expected ; after value");
-		return new Stmt.Print(value);
+		return Stmt.Print(value);
 	}
 
 	fun expressionStatment() : Stmt {
 		val expr = expression();
 		consume(SEMICOLON, "expected ; after value");
-		return new Stmt.Expression(expr);
-	}
-
-	fun visitExpressionStmt(Stmt.Expression stmt) {
-		evaluate(stmt.expression);
-		return null;
-	}
-
-	fun visitPrintStmt(Stmt.Print stmt) {
-		val value = evaluate(stmt.expression);
-		System.out.println(stringify(value));
+		return Stmt.Expression(expr);
 	}
 
 	fun expression() : Expr {
-		return equality()
+		return assignment()
 	}
 
 	fun equality() : Expr {
@@ -124,6 +188,10 @@ class Parser(val tokens : List<Token>) {
 			return Expr.Grouping(expr)
 		}
 
+		if(match(TokenType.IDENTIFIER)) {
+			return Expr.Variable(previous())
+		}
+
 		throw error(peek(), "primary didn't match current token")
 	}
 
@@ -162,7 +230,6 @@ class Parser(val tokens : List<Token>) {
 	fun peek() : Token { return this.tokens.get(current) }
 
 	fun previous() : Token {return this.tokens[current - 1] }
-
 
 	fun error(token: Token, message: String) : ParseError {
 		println(token.toString() + message)

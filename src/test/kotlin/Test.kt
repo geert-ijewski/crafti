@@ -123,4 +123,18 @@ class SampleTest {
         interpreter.interpret(parser.parse())
         assertEquals(0, outputs.size)
     }
+
+    @Test
+    fun testWhile() {
+        val scanner = Scanner("var a = 0; while (a < 5) { a = a + 2; } print a;")
+		val tokens = scanner.scanTokens() 
+        val parser = Parser(tokens)
+        val outputs = mutableListOf<String>()
+        val interpreter = Interpreter { str: String ->
+            outputs.add(str)
+        }
+        interpreter.interpret(parser.parse())
+        assertEquals(1, outputs.size)
+        assertEquals("6", outputs[0])
+    }
 }

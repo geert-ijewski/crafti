@@ -39,4 +39,8 @@ class AstPrinter : Expr.Visitor<String> {
 		ret += ")"
 		return ret
 	}
+
+	override fun visitCallExpr(expr: Expr.Call): String {
+		return parenthesize("call", expr.callee)
+	}
 }

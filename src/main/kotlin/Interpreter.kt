@@ -2,7 +2,8 @@ import TokenType.*
 import Expr
 
 class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stmt.Visitor<Any?> {
-    var enviroment = Enviroment()
+    final val globals = Enviroment()
+    var enviroment = globals
  
     fun interpret(statements : List<Stmt?>) {
         try {
@@ -131,5 +132,30 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
             execute(expr.body)
         }
         return null
+    }
+
+    override fun visitCallExpr(expr: Expr.Call) : Any?{
+        val callee: Any? = evaluate(expr.callee)
+        if(callee !is LoxCallable) {
+            throw RuntimeException("Can only call functions and classes.")
+        }
+
+        val arguments = mutableListOf<Any?>()
+        for(argument in expr.arguments) {
+            arguments.add(evaluate(argument))
+        }
+
+        val function = callee as? LoxCallable ?: throw RuntimeException("Can only call functions and classes.")
+        return function.call(this, arguments)
+    }
+
+    class ClockFunction : LoxCallable {
+        override fun arity(): Int {return 0}
+
+        override fun call(interpreter: Interpreter, arguments: List<Any?>) =
+                System.currentTimeMillis() / 1000.0
+    }
+    init {
+        globals.define("clock", ClockFunction())
     }
 }

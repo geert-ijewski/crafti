@@ -170,7 +170,7 @@ class Parser(val tokens : List<Token>) {
 			 return Expr.Unary(operator, right)
 		}
 
-		return primary()
+		return call()
 	}
 
 	fun primary(): Expr {
@@ -193,6 +193,35 @@ class Parser(val tokens : List<Token>) {
 		}
 
 		throw error(peek(), "primary didn't match current token")
+	}
+
+	fun call() : Expr {
+		var expr = primary()
+
+		while(true) {
+			if(match(LEFT_PAREN)) {
+				expr = finishCall(expr)
+			} else {
+				break
+			}
+		}
+
+		return expr
+	}
+
+	fun finishCall(callee: Expr) : Expr {
+		val arguments: MutableList<Expr> = mutableListOf()
+		if(!check(RIGHT_PAREN)) {
+			do {
+				if(arguments.size >= 255) {
+					error(peek(), "can't have more than 255 arguments")
+				}
+				arguments.add(expression())
+			} while(match(COMMA))
+		}
+
+		val paren = consume(RIGHT_PAREN, "expect ')' after arguments")
+		return Expr.Call(callee, paren, arguments)
 	}
 
 	fun consume(type: TokenType, message : String) : Token {

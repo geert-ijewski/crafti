@@ -6,7 +6,11 @@ class LoxFunction(val declaration: Stmt.Function) : LoxCallable {
         for(i in 0..arguments.size-1) {
             enviroment.define(declaration.params[i].lexeme, arguments[i])
         }
-        interpreter.execute(declaration.body, enviroment)
+        try {
+            interpreter.execute(declaration.body, enviroment)
+        } catch (returnValue: Return) {
+            return returnValue.value 
+        }
         return null
     }
 

@@ -62,7 +62,8 @@ class Parser(val tokens : List<Token>) {
 
 	fun statment() : Stmt {
 		if(match(IF)) { return ifStatment(); }
-		if(match(PRINT)) return printStatment();
+		if(match(PRINT)) return printStatment()
+		if(match(RETURN)) {return returnStatment()}
 		if(match(WHILE)) {
 			consume(LEFT_PAREN, "expect '(' after 'while'")
 			val condition = expression()
@@ -104,6 +105,13 @@ class Parser(val tokens : List<Token>) {
 		val value = expression();
 		consume(SEMICOLON, "expected ; after value");
 		return Stmt.Print(value);
+	}
+
+	fun returnStatment(): Stmt {
+		val keyword = previous()
+		val value = if(!check(SEMICOLON)) { expression() } else { null }
+		consume(SEMICOLON, "expected ; after return")
+		return Stmt.Return(keyword, value)
 	}
 
 	fun expressionStatment() : Stmt {

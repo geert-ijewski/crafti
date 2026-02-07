@@ -77,6 +77,15 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
         return null
 	}
 
+    override fun visitReturnStmt(stmt: Stmt.Return) : Any {
+        val value = if (stmt.value != null) {
+            evaluate(stmt.value)
+        } else {
+            null
+        }
+        throw Return(value)
+    }
+
     override fun visitIfStmt(stmt: Stmt.If): Any? {
         val condition = evaluate(stmt.condition) as Boolean
         if (condition) {

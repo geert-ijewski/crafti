@@ -149,6 +149,24 @@ class Interpreter(val printFunction: (String) -> Unit) : Expr.Visitor<Any?>, Stm
         return function.call(this, arguments)
     }
 
+    override fun visitFunctionStmt(stmt: Stmt.Function): Any? {
+        val function = LoxFunction(stmt)
+        enviroment.define(stmt.name.lexeme, function)
+        return null
+    }
+    
+    fun execute(stmts: Iterable<Stmt>, env: Enviroment) {
+       stmts.forEach { 
+           val previous = this.enviroment
+           try {
+               this.enviroment = env
+               execute(it)
+           } finally {
+               this.enviroment = previous
+           }
+       } 
+    }
+
     class ClockFunction : LoxCallable {
         override fun arity(): Int {return 0}
 

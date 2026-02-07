@@ -34,7 +34,9 @@ class Parser(val tokens : List<Token>) {
 
 	fun declaration() : Stmt? {
 		try {
-			return if(match(VAR)) {
+			return if(match(FUNCTION)) {
+				function("function")
+			} else if(match(VAR)) {
 				varDeclaration();
 			} else {
 				statment();
@@ -69,15 +71,19 @@ class Parser(val tokens : List<Token>) {
 			return Stmt.While(condition, body)
 		}
 		if(match(LEFT_BRACE)) {
-			val statements: MutableList<Stmt> = mutableListOf()
-			while(!check(RIGHT_BRACE) && !isAtEnd()) {
-				statements.add(declaration()!!)
-			}
-			consume(RIGHT_BRACE, "expect '}' after block")
-			return Stmt.Block(statements)
+			return Stmt.Block(block())
 		}
 
 		return expressionStatment();
+	}
+
+	fun block() : List<Stmt> {
+		val statements: MutableList<Stmt> = mutableListOf()
+		while(!check(RIGHT_BRACE) && !isAtEnd()) {
+			statements.add(declaration()!!)
+		}
+		consume(RIGHT_BRACE, "expect '}' after block")
+		return statements
 	}
 
 	fun ifStatment() : Stmt {
@@ -222,6 +228,25 @@ class Parser(val tokens : List<Token>) {
 
 		val paren = consume(RIGHT_PAREN, "expect ')' after arguments")
 		return Expr.Call(callee, paren, arguments)
+	}
+
+	fun function(kind: String) : Stmt? {
+		val name: Token = consume(IDENTIFIER, "expect $kind name")
+		consume(LEFT_PAREN, "expect '(' after $kind name")
+		val parameters: MutableList<Token> = mutableListOf()
+		if(!check(RIGHT_PAREN)) {
+			do {
+				if(parameters.size > 255) {
+					error(peek(), "can't have more than 255 parameters")
+				}
+				parameters.add(consume(IDENTIFIER, "expect parameter name"))
+			} while(match(COMMA))
+		}
+
+		consume(RIGHT_PAREN, "expect ')' after parameters")
+		consume(LEFT_BRACE, "expect '{' before $kind body")
+		val body = block()
+		return Stmt.Function(name, parameters, body)
 	}
 
 	fun consume(type: TokenType, message : String) : Token {
